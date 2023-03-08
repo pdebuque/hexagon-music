@@ -2,6 +2,7 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import './App.css';
 import Hexagon from './assets/Hexagon';
+import HexGrid from './assets/HexGrid';
 import {HexInt} from './model'
 import { SVG } from '@svgdotjs/svg.js'
 
@@ -18,7 +19,7 @@ function App() {
 
   return (
     <div className="App">
-      <Hexagon hex={{q: 1, r: 1, height: 30}}/>
+      <HexGrid/>
     </div>
   )
 }
