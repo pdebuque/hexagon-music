@@ -1,6 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import { HexInt } from '../model'
+import { useAppDispatch } from '../redux/hooks'
+import { setFocus } from '../redux/reducers/state.reducer';
+import { getNote } from '../modules/getNote';
 
 interface Props {
   hex: HexInt
@@ -20,37 +23,18 @@ const Hexagon: React.FC<Props> = (props) => {
     height
   } = hex
 
-  console.log(hex)
+  const dispatch = useAppDispatch()
+
+  const [hover, setHover] = useState<boolean>(false)
+
+  // console.log(hex)
 
   const svgStyle = {
     border: '2px solid black'
   }
 
-  //! temporary dimensions while i figure out equations
-  // const tempProps: HexInt = {
-  //   q: 1,
-  //   r: 0,
-  //   height: 200
-  // }
 
 
-  // points when origin is zero (aka, q: 0; r: 0) ['0, 100', '87,50', '87,-50', '0, -100', '-87,-50', '-87, 50']. 
-
-  // use "odd-r" layout (https://www.redblobgames.com/grids/hexagons/#coordinates-offset)
-
-  // q++ => hexagon moves right;
-  // r++ => hexagon moves down
-
-  /* 
-  (q,r) = (1,0) => all x-coordinates += height * sqrt(3)/2
-  
-  (q,r) = (0,1) => all x-coordinates += height/2
-      all y-coordinates += height 
-  
-  (q,r) = (1,1) 
-
-  
-  */
 
   const arrayAdd = (array: number[], number: number) => {
     return array.map(el => el + number)
@@ -60,31 +44,48 @@ const Hexagon: React.FC<Props> = (props) => {
   const yDef = [-height, -height / 2, height / 2, height];
 
   const xAdj = (q * height * Math.sqrt(3)) + (r * height * Math.sqrt(3) / 2);
-  const yAdj = (r * 1.5*height)
+  const yAdj = (r * 1.5 * height)
 
   const xGen = arrayAdd(xDef, xAdj);
   const yGen = arrayAdd(yDef, yAdj);
 
   const points = [
-    `${xGen[1]},${yGen[0]}`,
-    `${xGen[2]},${yGen[1]}`,
-    `${xGen[2]},${yGen[2]}`,
-    `${xGen[1]},${yGen[3]}`,
-    `${xGen[0]},${yGen[2]}`,
-    `${xGen[0]},${yGen[1]}`,
+    `${xDef[1]},${yDef[0]}`,
+    `${xDef[2]},${yDef[1]}`,
+    `${xDef[2]},${yDef[2]}`,
+    `${xDef[1]},${yDef[3]}`,
+    `${xDef[0]},${yDef[2]}`,
+    `${xDef[0]},${yDef[1]}`,
   ].join(' ')
 
-  console.log(xGen, yGen)
+  // console.log(xGen, yGen)
 
-
+  const handleClick = (e: React.MouseEvent) => {
+    // if (e) return;
+    console.log('clicked');
+    dispatch(setFocus({
+      hex: hex,
+      note: getNote(q,r)
+    }))
+  }
 
   return (
     <>
       {/* <svg style={svgStyle} height={500} width={500} viewBox="-150 -150 500 500"> */}
-      <g>
+
+      <g
+        onClick={handleClick}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        style={{ cursor: 'pointer' }}
+        transform={`translate(${xAdj},${yAdj})`}
+      >
         {/* (0,0) */}
-        <polygon points={points} fill='none' stroke='black'></polygon>
-        {/* <text x='-50%' y="50%">{xGen}, {yGen}</text> */}
+        <polygon
+          points={points}
+          fill={hover ? 'grey' : 'white'}
+          stroke='black' />
+        <g><text /* x={xAdj - height / 2} y={yAdj} */>{JSON.stringify(getNote(q,r))} ({q},{r})</text></g>
       </g>
 
       {/* </svg> */}

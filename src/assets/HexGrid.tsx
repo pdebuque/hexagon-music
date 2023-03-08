@@ -2,31 +2,28 @@ import React from 'react'
 
 import Hexagon from './Hexagon'
 
-import { HexInt } from '../model';
+import { HexInt, GridInt } from '../model';
 
 interface Props {
-  columns: number;
-  rows: number;
-  dimensions: number;
+  grid: GridInt
 }
 
 
-const HexGrid = () => {
+const HexGrid: React.FC<Props> = (props) => {
 
+  const { grid } = props
 
-
-  const tempProps: Props = {
-    columns: 3,
-    rows: 2,
-    dimensions: 100 //height of each hexagon
+  const gridDim = {
+    height: grid.cols * grid.hexHeight,
+    width: grid.rows * grid.hexHeight
   }
 
-  const createGrid = (props: Props) => {
+  const createGrid = (props: GridInt) => {
     const grid = [];
     for (let i = 0; i < props.rows; i++) {
       grid[i] = [];
-      for (let j = 0; j < props.columns; j++) {
-        addHex(grid, j, i, props.dimensions)
+      for (let j = 0; j < props.cols; j++) {
+        addHex(grid, j, i, props.hexHeight)
       }
     }
     return grid
@@ -40,19 +37,19 @@ const HexGrid = () => {
     }
   }
 
-  const gridToMap = createGrid(tempProps)
+  const gridToMap = createGrid(grid)
 
   return (
     // <svg height={1000} width = {'100vw'} xmlns="http://www.w3.org/2000/svg">
     <div>
       {/* <pre>{JSON.stringify(createGrid(tempProps), null, 2)}</pre> */}
-      <svg height={500} width={500} viewBox="-150 -150 500 500" xmlns="http://www.w3.org/2000/svg">
-        {createGrid(tempProps).map((row, i) => {
+      <svg height={2*gridDim.height} width={4*gridDim.width} viewBox={`${-grid.hexHeight} -${grid.hexHeight} ${4*gridDim.height} ${4*gridDim.width}`} xmlns="http://www.w3.org/2000/svg">
+        {createGrid(grid).map((row, i) => {
           return (
             <g key={i}>
               {row.map((el, j) => {
                 return (
-                  <Hexagon key = {j} hex={el}/>
+                  <Hexagon key={j} hex={el} />
                 )
               })}
             </g>
