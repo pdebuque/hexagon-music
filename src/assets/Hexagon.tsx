@@ -4,6 +4,7 @@ import { HexInt } from '../model'
 import { useAppDispatch } from '../redux/hooks'
 import { setFocus } from '../redux/reducers/state.reducer';
 import { getNote } from '../modules/getNote';
+import * as Tone from 'tone';
 
 interface Props {
   hex: HexInt
@@ -24,7 +25,6 @@ const Hexagon: React.FC<Props> = (props) => {
   } = hex
 
   const dispatch = useAppDispatch()
-
   const [hover, setHover] = useState<boolean>(false)
 
   // console.log(hex)
@@ -33,7 +33,7 @@ const Hexagon: React.FC<Props> = (props) => {
     border: '2px solid black'
   }
 
-
+const synth = new Tone.Synth().toDestination()
 
 
   const arrayAdd = (array: number[], number: number) => {
@@ -60,13 +60,16 @@ const Hexagon: React.FC<Props> = (props) => {
 
   // console.log(xGen, yGen)
 
+  const note = getNote(q,r)
+
   const handleClick = (e: React.MouseEvent) => {
     // if (e) return;
     console.log('clicked');
     dispatch(setFocus({
       hex: hex,
-      note: getNote(q,r)
-    }))
+      note: note
+    }));
+    synth.triggerAttackRelease(`${note.name}${note.octave}`, "16n")
   }
 
   return (
